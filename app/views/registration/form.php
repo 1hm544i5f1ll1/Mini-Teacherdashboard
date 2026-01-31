@@ -9,6 +9,8 @@ $old = $_SESSION['form_old'] ?? $_POST;
 unset($_SESSION['form_errors'], $_SESSION['form_old']);
 $ageOct = $r && !empty($r['dob']) ? age_on_1_october($r['dob'], $r['academic_year'] ?? '2025-2026') : null;
 $documents = $isEdit && isset($r['student_id']) ? (new \App\Modules\Registration\RegistrationRepo())->getDocuments($r['student_id']) : [];
+$committeesConfig = $committees_config ?? [];
+$committeeResults = $committee_results ?? [];
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -113,6 +115,54 @@ $documents = $isEdit && isset($r['student_id']) ? (new \App\Modules\Registration
                         <input type="text" name="guardian_address" value="<?= htmlspecialchars($old['guardian_address'] ?? $r['guardian_address'] ?? '') ?>" <?= !$canEdit ? 'readonly' : '' ?>>
                     </div>
                 </div>
+
+                <?php if ($isEdit && !empty($committeesConfig)): ?>
+                <h2 class="card-title mt-20">اللجان (11 لجنة) <br><small>Committees</small></h2>
+                <?php foreach ($committeesConfig as $ctype => $cconfig):
+                    $cres = $committeeResults[$ctype] ?? [];
+                    $items = $cres['items'] ?? [];
+                    $hasOpinion = !empty($cconfig['has_opinion']);
+                ?>
+                <details class="card mt-10" style="padding:15px;">
+                    <summary style="cursor:pointer; font-weight:bold;"><?= htmlspecialchars($cconfig['label_ar']) ?> — <?= htmlspecialchars($cconfig['label_en']) ?></summary>
+                    <div class="mt-15">
+                        <div class="form-group">
+                            <label>Test officer / مقدم التقييم</label>
+                            <input type="text" name="committee[<?= htmlspecialchars($ctype) ?>][examiner]" value="<?= htmlspecialchars($cres['examiner'] ?? '') ?>" <?= !$canEdit ? 'readonly' : '' ?>>
+                        </div>
+                        <?php if ($hasOpinion): ?>
+                        <div class="form-group">
+                            <label>Stage deputy's opinion / رأي نائب المرحلة</label>
+                            <textarea name="committee[<?= htmlspecialchars($ctype) ?>][deputy_opinion]" rows="2" <?= !$canEdit ? 'readonly' : '' ?>><?= htmlspecialchars($cres['deputy_opinion'] ?? '') ?></textarea>
+                        </div>
+                        <?php endif; ?>
+                        <div class="form-group">
+                            <label>Result / النتيجة</label>
+                            <select name="committee[<?= htmlspecialchars($ctype) ?>][result]" <?= !$canEdit ? 'disabled' : '' ?>>
+                                <option value="pending" <?= ($cres['result'] ?? '') === 'pending' ? 'selected' : '' ?>>—</option>
+                                <option value="accepted" <?= ($cres['result'] ?? '') === 'accepted' ? 'selected' : '' ?>>Accepted / مقبول</option>
+                                <option value="acceptable" <?= ($cres['result'] ?? '') === 'acceptable' ? 'selected' : '' ?>>Acceptable / مقبول بتحفظ</option>
+                                <option value="rejected" <?= ($cres['result'] ?? '') === 'rejected' ? 'selected' : '' ?>>Rejected / مرفوض</option>
+                            </select>
+                        </div>
+                        <table class="table" style="margin-top:15px;">
+                            <thead><tr><th>#</th><th>Question</th><th>Answer</th></tr></thead>
+                            <tbody>
+                            <?php foreach ($cconfig['questions'] as $idx => $qtext): ?>
+                                <tr>
+                                    <td><?= (int)$idx ?></td>
+                                    <td><?= htmlspecialchars($qtext) ?></td>
+                                    <td>
+                                        <input type="text" name="committee[<?= htmlspecialchars($ctype) ?>][items][<?= (int)$idx ?>]" value="<?= htmlspecialchars($items[$idx] ?? '') ?>" placeholder="Good / Yes / No …" style="width:100%;" <?= !$canEdit ? 'readonly' : '' ?>>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </details>
+                <?php endforeach; ?>
+                <?php endif; ?>
 
                 <?php if ($canEdit): ?>
                 <div class="mt-20">

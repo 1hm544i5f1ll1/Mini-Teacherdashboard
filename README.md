@@ -32,8 +32,11 @@ PHP-based school portal with **registration-only MVP**: student applications (dr
    mysql -u root -p sohag_kg_system < database/schema.sql
    mysql -u root -p sohag_kg_system < database/seed.sql
    # Registration MVP (draft → submitted → approved/locked)
-   mysql -u root -p sohag_kg_system < database/migrations/001_registration_mvp.sql
+   php scripts/run_migration.php
+   # Eleven registration committees (optional; schema.sql already includes these for fresh install)
+   php scripts/run_migration_002.php
    ```
+   Or with MySQL CLI: `mysql -u root -p sohag_kg_system < database/migrations/001_registration_mvp.sql` and same for `002_eleven_committees.sql`.
 
 4. **Run the app**
    ```bash
@@ -74,6 +77,7 @@ After login you are redirected to **/registration**. Default seed users: see `da
 - **Create:** Full name (AR), gender, religion, DOB, applied grade (PRE_KG / KG1), guardian name + phone(s) + optional address.
 - **Age on 1 October** is calculated and shown on form and summary.
 - **Status flow:** **Draft → Submitted → Approved or Rejected → Locked** (locked = immutable except manager view/print).
+- **Eleven committees:** Speech Specialist, Medical, Behavior (Qur’an), Educational, Parent/Guardian, Stage Deputy, Social Worker, Music, Physical Education, Activity, Behavior (Christian). Each committee has questions/items and a result (Accepted / Acceptable / Rejected). Filled on the registration edit form and shown on the summary/print.
 
 ### Documents
 

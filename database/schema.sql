@@ -38,8 +38,10 @@ CREATE TABLE guardians (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     phone VARCHAR(20) NOT NULL,
-    national_id VARCHAR(20) NOT NULL UNIQUE,
-    relationship VARCHAR(50) NOT NULL,
+    phone_2 VARCHAR(20) NULL,
+    national_id VARCHAR(20) NULL UNIQUE,
+    relationship VARCHAR(50) NULL,
+    address TEXT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_guardian_nid (national_id)
 );
@@ -75,27 +77,39 @@ CREATE TABLE student_documents (
     file_name VARCHAR(255) NOT NULL,
     file_path VARCHAR(255) NOT NULL,
     file_type VARCHAR(50) NOT NULL,
+    document_type VARCHAR(50) NOT NULL DEFAULT 'other',
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 );
 
--- Admissions
+-- Admissions (Registration MVP: draft → submitted → approved/rejected → locked)
 CREATE TABLE admissions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT NOT NULL,
     applied_grade ENUM('PRE_KG', 'KG1') NOT NULL,
+    academic_year VARCHAR(20) NOT NULL DEFAULT '2025-2026',
     test_datetime_from DATETIME,
     test_datetime_to DATETIME,
     notes TEXT,
-    status ENUM('pending', 'testing', 'accepted', 'rejected') DEFAULT 'pending',
+    status ENUM('draft', 'submitted', 'approved', 'rejected') NOT NULL DEFAULT 'draft',
     decision_note TEXT,
     decision_at DATETIME,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by INT NULL,
+    updated_by INT NULL,
+    submitted_at DATETIME NULL,
+    approved_by INT NULL,
+    locked_by INT NULL,
+    locked_at DATETIME NULL,
     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (approved_by) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (locked_by) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_admission_status (status)
 );
 
--- Committee Results
+-- Committee Results (legacy)
 CREATE TABLE committee_results (
     id INT AUTO_INCREMENT PRIMARY KEY,
     admission_id INT NOT NULL,
@@ -106,6 +120,32 @@ CREATE TABLE committee_results (
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (admission_id) REFERENCES admissions(id) ON DELETE CASCADE
+);
+
+-- Eleven registration committees: one row per committee per admission
+CREATE TABLE registration_committee_results (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    admission_id INT NOT NULL,
+    committee_type VARCHAR(50) NOT NULL,
+    result VARCHAR(20) NOT NULL DEFAULT 'pending',
+    examiner VARCHAR(150) NULL,
+    deputy_opinion TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_admission_committee (admission_id, committee_type),
+    FOREIGN KEY (admission_id) REFERENCES admissions(id) ON DELETE CASCADE,
+    INDEX idx_admission (admission_id)
+);
+
+-- One row per question/answer per committee result
+CREATE TABLE registration_committee_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    committee_result_id INT NOT NULL,
+    item_index INT NOT NULL,
+    answer_text VARCHAR(255) NOT NULL DEFAULT '',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_result_item (committee_result_id, item_index),
+    FOREIGN KEY (committee_result_id) REFERENCES registration_committee_results(id) ON DELETE CASCADE
 );
 
 -- Attendance

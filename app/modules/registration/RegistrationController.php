@@ -76,7 +76,9 @@ class RegistrationController extends Controller {
             return;
         }
         $canEdit = ($reg['status'] === 'draft' && (Auth::isTeacher() || Auth::isManager())) || (Auth::isManager() && empty($reg['locked_at']));
-        $this->view('registration/form', ['registration' => $reg, 'can_edit' => $canEdit]);
+        $committeesConfig = require BASE_PATH . '/app/config/committees.php';
+        $committeeResults = $this->repo->getCommitteeResults($id);
+        $this->view('registration/form', ['registration' => $reg, 'can_edit' => $canEdit, 'committees_config' => $committeesConfig, 'committee_results' => $committeeResults]);
     }
 
     /** Update (only when draft) */
@@ -105,6 +107,9 @@ class RegistrationController extends Controller {
         }
         try {
             $this->repo->updateRegistration($id, $_POST, Auth::id());
+            if (!empty($_POST['committee']) && is_array($_POST['committee'])) {
+                $this->repo->saveAllCommittees($id, $_POST['committee']);
+            }
             Logger::audit('Registration updated', 'admission', $id, 'Draft');
             $this->redirect('/registration?success=updated');
         } catch (\Throwable $e) {
@@ -189,6 +194,8 @@ class RegistrationController extends Controller {
             return;
         }
         $documents = $this->repo->getDocuments($reg['student_id']);
-        $this->view('registration/summary', ['registration' => $reg, 'documents' => $documents]);
+        $committeesConfig = require BASE_PATH . '/app/config/committees.php';
+        $committeeResults = $this->repo->getCommitteeResults($id);
+        $this->view('registration/summary', ['registration' => $reg, 'documents' => $documents, 'committees_config' => $committeesConfig, 'committee_results' => $committeeResults]);
     }
 }

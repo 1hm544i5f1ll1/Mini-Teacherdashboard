@@ -3,6 +3,9 @@ $base = rtrim(APP_URL, '/');
 $r = $registration;
 $ageOct = !empty($r['dob']) ? age_on_1_october($r['dob'], $r['academic_year'] ?? '2025-2026') : null;
 $statusAr = ['draft' => 'مسودة', 'submitted' => 'مقدم', 'approved' => 'مقبول', 'rejected' => 'مرفوض'];
+$committeesConfig = $committees_config ?? [];
+$committeeResults = $committee_results ?? [];
+$resultLabels = ['pending' => '—', 'accepted' => 'Accepted / مقبول', 'acceptable' => 'Acceptable / مقبول بتحفظ', 'rejected' => 'Rejected / مرفوض'];
 ?>
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
@@ -62,6 +65,32 @@ $statusAr = ['draft' => 'مسودة', 'submitted' => 'مقدم', 'approved' => '
                 <tr><th>تاريخ القفل</th><td><?= date('Y-m-d H:i', strtotime($r['locked_at'])) ?></td></tr>
                 <?php endif; ?>
             </table>
+            <?php if (!empty($committeesConfig)): ?>
+            <h3 style="margin-top:20px;">اللجان (11 لجنة) — Committees</h3>
+            <?php foreach ($committeesConfig as $ctype => $cconfig):
+                $cres = $committeeResults[$ctype] ?? [];
+                $items = $cres['items'] ?? [];
+            ?>
+            <div class="card mt-10" style="padding:15px;">
+                <h4><?= htmlspecialchars($cconfig['label_ar']) ?> — <?= htmlspecialchars($cconfig['label_en']) ?></h4>
+                <p><strong>Test officer:</strong> <?= htmlspecialchars($cres['examiner'] ?? '-') ?> | <strong>Result:</strong> <?= $resultLabels[$cres['result'] ?? 'pending'] ?? $cres['result'] ?></p>
+                <?php if (!empty($cres['deputy_opinion'])): ?><p><strong>Stage deputy's opinion:</strong> <?= htmlspecialchars($cres['deputy_opinion']) ?></p><?php endif; ?>
+                <table class="summary-table">
+                    <thead><tr><th>#</th><th>Question</th><th>Answer</th></tr></thead>
+                    <tbody>
+                    <?php foreach ($cconfig['questions'] as $idx => $qtext): ?>
+                        <tr>
+                            <td><?= (int)$idx ?></td>
+                            <td><?= htmlspecialchars($qtext) ?></td>
+                            <td><?= htmlspecialchars($items[$idx] ?? '-') ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php endforeach; ?>
+            <?php endif; ?>
+
             <?php if (!empty($documents)): ?>
             <h3 style="margin-top:20px;">المرفقات</h3>
             <ul>

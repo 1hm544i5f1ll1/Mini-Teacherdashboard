@@ -1,5 +1,6 @@
 -- Registration MVP: draft → submitted → approved/rejected → locked
--- Run ONCE after schema.sql (fresh DB or existing).
+-- Assumes database sohag_kg_system already exists (does not create or drop DB).
+-- Run ONCE on existing DB to add new columns. Safe if you already ran updated schema.sql.
 
 USE sohag_kg_system;
 

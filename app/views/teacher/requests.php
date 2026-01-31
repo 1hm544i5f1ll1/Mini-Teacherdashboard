@@ -1,10 +1,11 @@
+<?php use App\Core\Auth; $base = rtrim(APP_URL, '/'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Services - Teacher Portal</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="<?php echo $base; ?>/assets/style.css">
 </head>
 <body>
     <header class="header">
@@ -13,15 +14,16 @@
             <div class="school-name">City School - Teacher Portal</div>
         </div>
         <div class="header-right">
-            <div class="user-menu"><div class="user-avatar">AM</div><span>Ahmed Mohamed</span></div>
-            <a href="login.html" class="logout-btn">Logout</a>
+            <div class="user-menu"><div class="user-avatar"><?php echo substr(Auth::user()['full_name'] ?? 'U', 0, 1); ?></div><span><?php echo htmlspecialchars(Auth::user()['full_name'] ?? ''); ?></span></div>
+            <a href="<?php echo $base; ?>/auth/logout" class="logout-btn">Logout</a>
         </div>
     </header>
 
     <nav class="nav-tabs">
-        <a href="index.html" class="nav-tab">Teacher</a>
-        <a href="classes.html" class="nav-tab">Class</a>
-        <a href="requests.html" class="nav-tab active">HR</a>
+        <a href="<?php echo $base; ?>/registration" class="nav-tab">التسجيل / Registration</a>
+        <a href="<?php echo $base; ?>/teacher" class="nav-tab">Teacher</a>
+        <a href="<?php echo $base; ?>/teacher/classes" class="nav-tab">Class</a>
+        <a href="<?php echo $base; ?>/teacher/hr" class="nav-tab active">HR</a>
     </nav>
 
     <div class="sub-nav">
@@ -70,23 +72,25 @@
         </section>
     </main>
 
-    <script src="core.js"></script>
+    <script src="<?php echo $base; ?>/assets/core.js"></script>
     <script>
         function switchTab(id) {
             document.querySelectorAll('main > section').forEach(s => s.style.display = 'none');
-            document.getElementById('sec-' + id).style.display = 'block';
+            var el = document.getElementById('sec-' + id);
+            if (el) el.style.display = 'block';
             document.querySelectorAll('.sub-nav-item').forEach(i => i.classList.remove('active'));
-            if(event.target.tagName === 'A') event.target.classList.add('active');
+            if (event && event.target && event.target.tagName === 'A') event.target.classList.add('active');
             renderTrack();
         }
 
         function renderTrack() {
-            const data = storage.get();
-            const exitRows = data.exit_permissions.map(p => [p.start, p.end, p.reason, ui.statusBadge(p.status)]);
-            document.getElementById('exit-track').innerHTML = ui.createTable(['Start', 'End', 'Reason', 'Status'], exitRows);
-            
-            const leaveRows = data.leave_requests.map(l => [l.from, l.to, l.type, ui.statusBadge(l.status)]);
-            document.getElementById('leave-track').innerHTML = ui.createTable(['From', 'To', 'Type', 'Status'], leaveRows);
+            var data = (typeof storage !== 'undefined' && storage.get) ? storage.get() : { exit_permissions: [], leave_requests: [] };
+            var exitRows = (data.exit_permissions || []).map(function(p) { return [p.start, p.end, p.reason, (typeof ui !== 'undefined' && ui.statusBadge) ? ui.statusBadge(p.status) : p.status]; });
+            var leaveRows = (data.leave_requests || []).map(function(l) { return [l.from, l.to, l.type, (typeof ui !== 'undefined' && ui.statusBadge) ? ui.statusBadge(l.status) : l.status]; });
+            var exitEl = document.getElementById('exit-track');
+            var leaveEl = document.getElementById('leave-track');
+            if (exitEl && typeof ui !== 'undefined' && ui.createTable) exitEl.innerHTML = ui.createTable(['Start', 'End', 'Reason', 'Status'], exitRows); else if (exitEl) exitEl.innerHTML = exitRows.length ? '<p>No exit permissions yet.</p>' : '<p>No data.</p>';
+            if (leaveEl && typeof ui !== 'undefined' && ui.createTable) leaveEl.innerHTML = ui.createTable(['From', 'To', 'Type', 'Status'], leaveRows); else if (leaveEl) leaveEl.innerHTML = leaveRows.length ? '<p>No leave requests yet.</p>' : '<p>No data.</p>';
         }
 
         function saveReq(e, type) {

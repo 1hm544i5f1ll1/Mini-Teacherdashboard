@@ -217,4 +217,70 @@ class RegistrationRepo {
         $stmt->execute([$studentId]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+    /** Get all committee results for an admission (11 committees) */
+    public function getCommitteeResults($admissionId) {
+        $stmt = $this->db->prepare("SELECT id, committee_type, result, examiner, deputy_opinion FROM registration_committee_results WHERE admission_id = ?");
+        $stmt->execute([$admissionId]);
+        $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $byType = [];
+        $idToType = [];
+        foreach ($rows as $r) {
+            $idToType[(int)$r['id']] = $r['committee_type'];
+            $byType[$r['committee_type']] = [
+                'id' => $r['id'],
+                'result' => $r['result'],
+                'examiner' => $r['examiner'],
+                'deputy_opinion' => $r['deputy_opinion'],
+                'items' => [],
+            ];
+        }
+        if (empty($byType)) return $byType;
+        $ids = array_column($rows, 'id');
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $this->db->prepare("SELECT committee_result_id, item_index, answer_text FROM registration_committee_items WHERE committee_result_id IN ($placeholders)");
+        $stmt->execute($ids);
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $rid = (int)$row['committee_result_id'];
+            $t = $idToType[$rid] ?? null;
+            if ($t) {
+                $byType[$t]['items'][(int)$row['item_index']] = $row['answer_text'];
+            }
+        }
+        return $byType;
+    }
+
+    /** Save one committee result and its items (upsert) */
+    public function saveCommitteeResult($admissionId, $committeeType, $examiner, $result, $deputyOpinion, array $items) {
+        $stmt = $this->db->prepare("SELECT id FROM registration_committee_results WHERE admission_id = ? AND committee_type = ?");
+        $stmt->execute([$admissionId, $committeeType]);
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if ($row) {
+            $this->db->prepare("UPDATE registration_committee_results SET result=?, examiner=?, deputy_opinion=? WHERE id=?")
+                ->execute([$result ?: 'pending', $examiner, $deputyOpinion, $row['id']]);
+            $resultId = (int)$row['id'];
+            $this->db->prepare("DELETE FROM registration_committee_items WHERE committee_result_id = ?")->execute([$resultId]);
+        } else {
+            $this->db->prepare("INSERT INTO registration_committee_results (admission_id, committee_type, result, examiner, deputy_opinion) VALUES (?,?,?,?,?)")
+                ->execute([$admissionId, $committeeType, $result ?: 'pending', $examiner, $deputyOpinion]);
+            $resultId = (int)$this->db->lastInsertId();
+        }
+        $ins = $this->db->prepare("INSERT INTO registration_committee_items (committee_result_id, item_index, answer_text) VALUES (?,?,?)");
+        foreach ($items as $idx => $text) {
+            $ins->execute([$resultId, (int)$idx, (string)$text]);
+        }
+        return $resultId;
+    }
+
+    /** Save all committees from POST-style array: committee[type][examiner], committee[type][result], committee[type][items][n] */
+    public function saveAllCommittees($admissionId, array $committeeData) {
+        foreach ($committeeData as $type => $data) {
+            $examiner = $data['examiner'] ?? '';
+            $result = $data['result'] ?? 'pending';
+            $deputyOpinion = $data['deputy_opinion'] ?? null;
+            $items = $data['items'] ?? [];
+            if (!is_array($items)) $items = [];
+            $this->saveCommitteeResult($admissionId, $type, $examiner, $result, $deputyOpinion, $items);
+        }
+    }
 }

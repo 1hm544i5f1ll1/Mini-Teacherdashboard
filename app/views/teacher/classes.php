@@ -1,10 +1,11 @@
+<?php use App\Core\Auth; $base = rtrim(APP_URL, '/'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classes - Teacher Portal</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="<?php echo $base; ?>/assets/style.css">
 </head>
 <body>
     <!-- Header -->
@@ -15,18 +16,19 @@
         </div>
         <div class="header-right">
             <div class="user-menu">
-                <div class="user-avatar">AM</div>
-                <span>Ahmed Mohamed</span>
+                <div class="user-avatar"><?php echo substr(Auth::user()['full_name'] ?? 'U', 0, 1); ?></div>
+                <span><?php echo htmlspecialchars(Auth::user()['full_name'] ?? ''); ?></span>
             </div>
-            <a href="login.html" class="logout-btn">Logout</a>
+            <a href="<?php echo $base; ?>/auth/logout" class="logout-btn">Logout</a>
         </div>
     </header>
 
     <!-- Navigation Tabs -->
     <nav class="nav-tabs">
-        <a href="index.html" class="nav-tab">Teacher</a>
-        <a href="classes.html" class="nav-tab active">Class</a>
-        <a href="requests.html" class="nav-tab">HR</a>
+        <a href="<?php echo $base; ?>/registration" class="nav-tab">التسجيل / Registration</a>
+        <a href="<?php echo $base; ?>/teacher" class="nav-tab">Teacher</a>
+        <a href="<?php echo $base; ?>/teacher/classes" class="nav-tab active">Class</a>
+        <a href="<?php echo $base; ?>/teacher/hr" class="nav-tab">HR</a>
     </nav>
 
     <!-- Main Content -->
@@ -70,7 +72,7 @@
                             <td>25</td>
                             <td>Sun, Tue, Thu</td>
                             <td>
-                                <a href="students.html?class=3A" class="btn btn-primary btn-small">View Students</a>
+                                <a href="<?php echo $base; ?>/teacher/students?class_id=1" class="btn btn-primary btn-small">View Students</a>
                             </td>
                         </tr>
                         <tr>
@@ -80,7 +82,7 @@
                             <td>23</td>
                             <td>Mon, Wed</td>
                             <td>
-                                <a href="students.html?class=3B" class="btn btn-primary btn-small">View Students</a>
+                                <a href="<?php echo $base; ?>/teacher/students?class_id=2" class="btn btn-primary btn-small">View Students</a>
                             </td>
                         </tr>
                         <tr>
@@ -90,7 +92,7 @@
                             <td>27</td>
                             <td>Sun, Tue, Wed</td>
                             <td>
-                                <a href="students.html?class=3C" class="btn btn-primary btn-small">View Students</a>
+                                <a href="<?php echo $base; ?>/teacher/students?class_id=3" class="btn btn-primary btn-small">View Students</a>
                             </td>
                         </tr>
                         <tr>
@@ -100,7 +102,7 @@
                             <td>22</td>
                             <td>Mon, Thu</td>
                             <td>
-                                <a href="students.html?class=4A" class="btn btn-primary btn-small">View Students</a>
+                                <a href="<?php echo $base; ?>/teacher/students?class_id=4" class="btn btn-primary btn-small">View Students</a>
                             </td>
                         </tr>
                         <tr>
@@ -110,7 +112,7 @@
                             <td>23</td>
                             <td>Tue, Wed</td>
                             <td>
-                                <a href="students.html?class=4B" class="btn btn-primary btn-small">View Students</a>
+                                <a href="<?php echo $base; ?>/teacher/students?class_id=5" class="btn btn-primary btn-small">View Students</a>
                             </td>
                         </tr>
                     </tbody>

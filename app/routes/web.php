@@ -40,6 +40,18 @@ $router->get('/teacher', function() {
     View::render('teacher/index');
 }, [RequireLogin::class]);
 
+$router->get('/teacher/classes', function() {
+    View::render('teacher/classes');
+}, [RequireLogin::class]);
+
+$router->get('/teacher/hr', function() {
+    View::render('teacher/requests');
+}, [RequireLogin::class]);
+
+$router->get('/teacher/requests', function() {
+    View::render('teacher/requests');
+}, [RequireLogin::class]);
+
 // Students
 $router->get('/teacher/students', [\App\Modules\Students\StudentsController::class, 'index'], [RequireLogin::class]);
 $router->post('/teacher/students', [\App\Modules\Students\StudentsController::class, 'store'], [RequireLogin::class]);
