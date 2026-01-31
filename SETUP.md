@@ -42,6 +42,11 @@ Or manually:
 2. Create database: `sohag_kg_system`
 3. Import `database/schema.sql`
 4. Import `database/seed.sql`
+5. **Registration MVP**: Run the migration once to enable registration flow (draft → submitted → approved/rejected → locked):
+   ```bash
+   mysql -u root -p sohag_kg_system < database/migrations/001_registration_mvp.sql
+   ```
+   Or in phpMyAdmin: open `database/migrations/001_registration_mvp.sql`, copy contents, and run in the SQL tab.
 
 ### Step 4: Configure Web Server
 

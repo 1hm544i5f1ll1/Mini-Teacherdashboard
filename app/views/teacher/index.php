@@ -20,6 +20,7 @@
     </header>
 
     <nav class="nav-tabs">
+        <a href="<?php echo APP_URL; ?>/registration" class="nav-tab">التسجيل / Registration</a>
         <a href="<?php echo APP_URL; ?>/teacher" class="nav-tab active">Teacher</a>
         <a href="<?php echo APP_URL; ?>/teacher/classes" class="nav-tab">Class</a>
         <a href="<?php echo APP_URL; ?>/teacher/hr" class="nav-tab">HR</a>

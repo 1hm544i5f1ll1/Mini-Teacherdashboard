@@ -1,279 +1,159 @@
-# City School Portal - Multi-Page System
+# City School Portal – KG Registration
 
-## Overview
-Complete school management system with separate **Teacher** and **Manager** interfaces.
-
-## Login Credentials
-
-### Access the System
-1. Open `login.html` in your browser
-2. Choose user type (Teacher or Manager)
-3. Enter credentials:
-
-**Teacher Login:**
-- Username: `teacher`
-- Password: `teacher`
-- Access: Teacher Portal (7 tabs)
-
-**Manager Login:**
-- Username: `admin`
-- Password: `admin`
-- Access: Manager Portal (8 tabs)
+PHP-based school portal with **registration-only MVP**: student applications (draft → submitted → approved/rejected → locked), document uploads, and registration summary (print/PDF). Separate **Registrar (Teacher)** and **Manager** roles.
 
 ---
 
-## Teacher Interface (7 Simple Tabs)
+## Tech Stack
 
-### 🟦 Tab 1: Home
-**File:** `teacher/index.html`
-- Today's class schedule
-- Quick stats (classes, students, tasks, alerts)
-- Today's alerts (absent students, early dismissals, messages)
-- Today's tasks checklist
-- Quick action buttons
-
-### 🟦 Tab 2: Classes
-**File:** `teacher/classes.html` (to be created)
-- My classes list
-- Student list per class
-- Class timetable (read-only)
-- Break times (read-only)
-
-### 🟦 Tab 3: Attendance
-**File:** `teacher/attendance.html` (to be created)
-- Take student attendance (P/A/L)
-- Edit same day only
-- View attendance history (read-only)
-
-### 🟦 Tab 4: Students
-**File:** `teacher/students.html` (to be created)
-- Student profiles (view only)
-- Parent contacts (view only)
-- Student IDs with QR/barcode (view only)
-- Entry/exit log (view only)
-
-### 🟦 Tab 5: Messages
-**File:** `teacher/messages.html` ✅ COMPLETED
-- Send WhatsApp to individual student
-- Send WhatsApp to entire class
-- View message history
-- Professional messaging interface
-
-### 🟦 Tab 6: Tasks & Polls
-**File:** `teacher/tasks.html` (to be created)
-- View daily tasks
-- Mark tasks as done
-- Add notes to tasks
-- View polls
-- Vote in polls
-
-### 🟦 Tab 7: Requests
-**File:** `teacher/requests.html` (to be created)
-- Request holiday/leave
-- Request permission slip
-- Request early dismissal
-- View request status (pending/approved/rejected)
+- **Backend:** PHP 7.4+ (session auth, CSRF, PDO)
+- **Database:** MySQL / MariaDB (utf8mb4)
+- **Frontend:** HTML, CSS, minimal JS (no framework)
+- **Server:** Apache or PHP built-in server
 
 ---
 
-## Manager Interface (8 Comprehensive Tabs)
+## Quick Start
 
-### 🟥 Tab 1: Dashboard
-**File:** `manager/index.html` ✅ COMPLETED
-- School overview stats
-- Priority alerts
-- Today's attendance summary (students + staff)
-- Pending approvals count
-- Recent activity log
-- Classes overview table
-- Quick actions
+1. **Clone and enter project**
+   ```bash
+   git clone <your-repo-url>
+   cd Mini-Teacherdashboard
+   ```
 
-### 🟥 Tab 2: Setup
-**File:** `manager/setup.html` (to be created)
-**Features:**
-- Manage classes (add/edit/delete)
-- Set timetables
-- Configure breaks
-- Set school holidays
-- Academic calendar
+2. **Configure database**  
+   Copy `.env.example` to `.env` (or set in `app/config/config.php`):
+   - `DB_HOST`, `DB_PORT` (e.g. 3306 or 3307), `DB_USER`, `DB_PASS`, `DB_NAME` (e.g. `sohag_kg_system`).
 
-### 🟥 Tab 3: People
-**File:** `manager/people.html` (to be created)
-**Features:**
-- **Students:**
-  - Add/edit/delete students
-  - Student ID, DOB, address
-  - Phone, WhatsApp, parent info
-  - Assign to classes
-  - Generate student IDs (QR/barcode)
-  
-- **Teachers & Staff:**
-  - Add/edit/delete staff
-  - Assign classes to teachers
-  - Set permissions
-  - View staff profiles
+3. **Create database and tables**
+   ```bash
+   # Create DB and import schema + seed
+   mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS sohag_kg_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+   mysql -u root -p sohag_kg_system < database/schema.sql
+   mysql -u root -p sohag_kg_system < database/seed.sql
+   # Registration MVP (draft → submitted → approved/locked)
+   mysql -u root -p sohag_kg_system < database/migrations/001_registration_mvp.sql
+   ```
 
-### 🟥 Tab 4: Attendance
-**File:** `manager/attendance.html` (to be created)
-**Features:**
-- View all student attendance
-- View all staff attendance
-- Attendance reports
-- Late arrivals tracking
-- Monthly summaries
+4. **Run the app**
+   ```bash
+   cd public
+   php -S localhost:8000
+   ```
+   Open **http://localhost:8000** → login → you land on the registration list.
 
-### 🟥 Tab 5: Safety
-**File:** `manager/safety.html` (to be created)
-**Features:**
-- **ID Scans:**
-  - View all gate entries
-  - Real-time entry log
-  - Student ID scanning
-  
-- **Early Dismissal:**
-  - Approve/reject requests
-  - Track who picked up student
-  - Log time and reason
-  - View pickup history
-  
-- **Pickup Logs:**
-  - Complete audit trail
-  - Filter by date/student
-  - Export logs
+5. **Create uploads folder** (if you use document upload)
+   ```bash
+   mkdir -p storage/uploads
+   ```
 
-### 🟥 Tab 6: Communication
-**File:** `manager/communication.html` (to be created)
-**Features:**
-- Create WhatsApp templates
-- Send broadcast messages
-- Message to specific classes
-- Message to all parents
-- View message analytics
-
-### 🟥 Tab 7: Tasks & Polls
-**File:** `manager/tasks-polls.html` (to be created)
-**Features:**
-- **Tasks:**
-  - Create daily tasks for teachers
-  - Assign to specific teachers/all
-  - View completion status
-  - Add deadlines
-  
-- **Polls:**
-  - Create polls
-  - Assign to teachers/students
-  - View poll results
-  - Export poll data
-
-### 🟥 Tab 8: Reports
-**File:** `manager/reports.html` (to be created)
-**Features:**
-- Attendance reports
-- Student performance
-- Staff activity logs
-- Gate entry/exit logs
-- Message history
-- Export to Excel/PDF
+For more options (XAMPP, Apache, ports), see [SETUP.md](SETUP.md).
 
 ---
 
-## Technical Structure
+## Login & Roles
 
-### File Organization
+| Role   | Username  | Password   | Access |
+|--------|-----------|------------|--------|
+| Manager | `manager` | (see seed) | View all, approve/reject, lock, print summary |
+| Registrar | `ahmed` or teacher user | (see seed) | Create/edit draft, submit, upload documents |
+
+After login you are redirected to **/registration**. Default seed users: see `database/seed.sql` (e.g. manager / teacher with hashed passwords). Use `scripts/create_manager.php` or `scripts/reset_passwords.php` if needed.
+
+---
+
+## Registration MVP (What Works)
+
+### Roles
+
+- **Manager:** View all applications, approve or reject (with note), lock record (no further edits), open registration summary and print/save as PDF.
+- **Registrar (Teacher):** Create student + guardian, edit draft, upload documents (birth cert, photo, committee scans), submit application.
+
+### Student Registration
+
+- **Create:** Full name (AR), gender, religion, DOB, applied grade (PRE_KG / KG1), guardian name + phone(s) + optional address.
+- **Age on 1 October** is calculated and shown on form and summary.
+- **Status flow:** **Draft → Submitted → Approved or Rejected → Locked** (locked = immutable except manager view/print).
+
+### Documents
+
+- Upload: birth certificate, photo, committee scans (PDF, JPG, PNG; max 5 MB; type allowlist).
+- Download: safe attachment; access checked per registration.
+
+### Search & List
+
+- Filters: status (draft/submitted/approved/rejected), grade, date range.
+- Search: by name, phone, or ID.
+
+### Audit
+
+- Created by/at, updated by, submitted at, approved by/at, locked by/at; plus `audit_logs` for actions.
+
+---
+
+## Project Structure
+
 ```
-teacher-portal/
-├── login.html          ← Main login page
-├── style.css           ← CSS for login page
-├── teacher/            ← Teacher interface folder
-│   ├── style.css       ← CSS for teacher pages
-│   ├── index.html      ✅ Home page
-│   ├── classes.html    🔄 To be created
-│   ├── attendance.html 🔄 To be created
-│   ├── students.html   🔄 To be created
-│   ├── messages.html   ✅ Messages page
-│   ├── tasks.html      🔄 To be created
-│   └── requests.html   🔄 To be created
-└── manager/            ← Manager interface folder
-    ├── style.css       ← CSS for manager pages
-    ├── index.html      ✅ Dashboard
-    ├── setup.html      🔄 To be created
-    ├── people.html     🔄 To be created
-    ├── attendance.html 🔄 To be created
-    ├── safety.html     🔄 To be created
-    ├── communication.html 🔄 To be created
-    ├── tasks-polls.html   🔄 To be created
-    └── reports.html    🔄 To be created
+Mini-Teacherdashboard/
+├── app/
+│   ├── config/          # DB, app URL, session, paths
+│   ├── core/            # Auth, Router, DB, View, Csrf, Logger, Validator, helpers
+│   ├── middleware/      # RequireLogin, RequireRole
+│   ├── modules/
+│   │   ├── registration/  # RegistrationRepo, RegistrationController
+│   │   ├── documents/    # DocumentsController (upload/download)
+│   │   ├── admissions/   # Legacy admissions
+│   │   ├── auth/         # Login / logout
+│   │   └── ...
+│   ├── routes/          # web.php
+│   └── views/           # auth/, manager/, teacher/, registration/
+├── database/
+│   ├── schema.sql       # Full schema
+│   ├── seed.sql         # Users, sample data
+│   └── migrations/
+│       └── 001_registration_mvp.sql   # Registration status + audit columns
+├── public/              # Document root
+│   ├── index.php       # Entry point
+│   └── assets/         # CSS, JS, images
+├── storage/             # logs/, uploads/
+├── scripts/             # install, backup, create_manager, reset_passwords
+├── SETUP.md             # Detailed setup
+└── README.md            # This file
 ```
 
-### CSS Implementation
-- **CSS file in each folder** (`style.css`)
-- Teacher pages use: `<link rel="stylesheet" href="style.css">`
-- Manager pages use: `<link rel="stylesheet" href="style.css">`
-- Login page uses: `<link rel="stylesheet" href="style.css">`
-- CSS is properly linked and working ✅
-- Responsive design included
-- Mobile-friendly navigation
-
-### Navigation Structure
-- **Teacher:** Horizontal tab navigation (7 tabs)
-- **Manager:** Horizontal tab navigation (8 tabs)
-- Active tab highlighting
-- Consistent header across all pages
-- Logout button on every page
-
 ---
 
-## Features Summary
+## Main Routes
 
-### ✅ Completed Features
-1. Login system with role selection
-2. Shared CSS with proper linking
-3. Teacher Home/Dashboard
-4. Teacher Messages (WhatsApp)
-5. Manager Dashboard with overview
-
-### 🔄 Features to Implement
-1. Teacher: Classes, Attendance, Students, Tasks, Requests pages
-2. Manager: Setup, People, Attendance, Safety, Communication, Tasks/Polls, Reports pages
-3. CRUD operations for all entities
-4. Database integration (currently using JavaScript)
-
----
-
-## How to Use
-
-### For Teachers:
-1. Login with teacher credentials
-2. View today's schedule on Home
-3. Take attendance as needed
-4. Send WhatsApp messages to students/parents
-5. Complete daily tasks
-6. Submit leave requests
-
-### For Managers:
-1. Login with admin credentials
-2. Monitor school overview on Dashboard
-3. Approve/reject early dismissals
-4. Manage students and staff
-5. Create classes and timetables
-6. Send broadcast messages
-7. Generate reports
-
----
-
-## Next Steps
-Would you like me to:
-1. Complete all remaining Teacher pages?
-2. Complete all remaining Manager pages?
-3. Add specific features (QR scanning, PDF reports, etc.)?
-4. Add data persistence (localStorage or backend)?
+| Route | Method | Description |
+|-------|--------|-------------|
+| `/` | GET | Redirect to login |
+| `/auth/login` | GET/POST | Login (redirect to `/registration`) |
+| `/auth/logout` | GET | Logout |
+| `/registration` | GET | List registrations (filters, search) |
+| `/registration/create` | GET | New registration form |
+| `/registration/store` | POST | Create draft |
+| `/registration/edit?id=` | GET | Edit form (draft only) |
+| `/registration/update` | POST | Update draft |
+| `/registration/submit` | POST | Submit application |
+| `/registration/approve` | POST | Manager: approve |
+| `/registration/reject` | POST | Manager: reject |
+| `/registration/lock` | POST | Manager: lock record |
+| `/registration/summary?id=` | GET | Registration summary (print/PDF) |
+| `/documents/upload` | POST | Upload file for a registration |
+| `/documents/download?id=` | GET | Download document |
+| `/teacher`, `/manager` | GET | Dashboards (optional) |
 
 ---
 
 ## Status
-- ✅ Login system ready
-- ✅ CSS working properly
-- ✅ Multi-page structure set up
-- ✅ Teacher and Manager portals separated
-- ✅ 3 pages completed (Login, Teacher Home, Teacher Messages, Manager Dashboard)
-- 🔄 12 pages remaining to implement full functionality
+
+- **Registration MVP:** ✅ End-to-end (create → submit → approve/reject → lock, documents, summary/print).
+- **Auth:** ✅ Session login, CSRF on POST, role-based access in controllers.
+- **Legacy / optional:** Teacher and Manager dashboards, admissions (old flow); some pages are placeholders.
+
+---
+
+## License & Contributing
+
+Use and modify as needed. For bugs or features, open an issue or PR on GitHub.

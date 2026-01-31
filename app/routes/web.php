@@ -58,4 +58,18 @@ $router->post('/teacher/attendance', [\App\Modules\Attendance\AttendanceControll
 $router->get('/teacher/exams', [\App\Modules\Exams\ExamsController::class, 'index'], [RequireLogin::class]);
 $router->post('/teacher/exams/marks', [\App\Modules\Exams\ExamsController::class, 'storeResults'], [RequireLogin::class]);
 
-// Add more routes as needed...
+// Registration (MVP) — Teacher + Manager
+$router->get('/registration', [\App\Modules\Registration\RegistrationController::class, 'index'], [RequireLogin::class]);
+$router->get('/registration/create', [\App\Modules\Registration\RegistrationController::class, 'createForm'], [RequireLogin::class]);
+$router->post('/registration/store', [\App\Modules\Registration\RegistrationController::class, 'store'], [RequireLogin::class]);
+$router->get('/registration/edit', [\App\Modules\Registration\RegistrationController::class, 'editForm'], [RequireLogin::class]);
+$router->post('/registration/update', [\App\Modules\Registration\RegistrationController::class, 'update'], [RequireLogin::class]);
+$router->post('/registration/submit', [\App\Modules\Registration\RegistrationController::class, 'submit'], [RequireLogin::class]);
+$router->post('/registration/approve', [\App\Modules\Registration\RegistrationController::class, 'approve'], [RequireLogin::class]);
+$router->post('/registration/reject', [\App\Modules\Registration\RegistrationController::class, 'reject'], [RequireLogin::class]);
+$router->post('/registration/lock', [\App\Modules\Registration\RegistrationController::class, 'lock'], [RequireLogin::class]);
+$router->get('/registration/summary', [\App\Modules\Registration\RegistrationController::class, 'summary'], [RequireLogin::class]);
+
+// Documents (upload / download for registration)
+$router->post('/documents/upload', [\App\Modules\Documents\DocumentsController::class, 'upload'], [RequireLogin::class]);
+$router->get('/documents/download', [\App\Modules\Documents\DocumentsController::class, 'download'], [RequireLogin::class]);

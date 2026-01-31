@@ -20,6 +20,7 @@
     </header>
 
     <nav class="nav-tabs">
+        <a href="<?php echo APP_URL; ?>/registration" class="nav-tab">التسجيل / Registration</a>
         <a href="<?php echo APP_URL; ?>/manager/admissions" class="nav-tab">Admissions</a>
         <a href="<?php echo APP_URL; ?>/manager/teachers" class="nav-tab">Teachers</a>
         <a href="<?php echo APP_URL; ?>/manager" class="nav-tab active">Classes</a>
@@ -44,7 +45,8 @@
             <div class="card">
                 <h2 class="card-title">Manager Quick Actions</h2>
                 <div class="flex-column gap-10">
-                    <a href="<?php echo APP_URL; ?>/manager/admissions" class="btn btn-primary">Review New Applications</a>
+                    <a href="<?php echo APP_URL; ?>/registration" class="btn btn-primary">التسجيل / Registration List</a>
+                    <a href="<?php echo APP_URL; ?>/manager/admissions" class="btn btn-primary">Admissions (Legacy)</a>
                     <a href="<?php echo APP_URL; ?>/manager/hr" class="btn btn-warning">Approve Exit Permissions</a>
                     <a href="<?php echo APP_URL; ?>/manager/finance" class="btn btn-success">Generate Term Invoices</a>
                 </div>

@@ -11,6 +11,7 @@ composer.lock
 storage/logs/*.log
 storage/cache/*
 storage/sessions/*
+storage/uploads/*
 
 # IDE
 .idea/

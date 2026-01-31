@@ -31,7 +31,7 @@ class AuthController extends Controller {
             Auth::login($user);
             Logger::log("User logged in: $username");
             
-            $this->redirect(Auth::isManager() ? '/manager' : '/teacher');
+            $this->redirect('/registration');
         } else {
             $this->logAttempt($username, false);
             Logger::security("Failed login attempt for username: $username");

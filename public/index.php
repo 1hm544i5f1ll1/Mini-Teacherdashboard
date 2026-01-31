@@ -31,6 +31,7 @@ spl_autoload_register(function ($class) {
 
 // Load config
 require_once __DIR__ . '/../app/config/config.php';
+require_once __DIR__ . '/../app/core/helpers.php';
 
 // Dispatch router
 $router = new App\Core\Router();
