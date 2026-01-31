@@ -1,0 +1,2 @@
+# Block access to sensitive directories
+RedirectMatch 404 ^/(app|storage|database|scripts|apache|mnt|Whats)($|/)

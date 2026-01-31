@@ -1,0 +1,28 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# PHP
+vendor/
+composer.lock
+
+# Logs and storage
+storage/logs/*.log
+storage/cache/*
+storage/sessions/*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build / temp
+node_modules/
+*.log
